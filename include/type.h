@@ -9,7 +9,7 @@
 */
 
 #pragma once
-#include <cstdint>
+#include <stdint.h>
 
 typedef uintmax_t   umax_t;
 typedef uint64_t    u64;
@@ -22,8 +22,10 @@ typedef int32_t     s32;
 typedef int16_t     s16;
 typedef int8_t      s8;
 typedef float       f32;
-typedef double      f64;
-#define scast(var, type) static_cast<type>(var)
+#if defined(__cplusplus)
+    typedef double      f64;
+    #define scast(var, type) static_cast<type>(var)
+#endif
 #define max(a,b) (((a) > (b)) ? (a) : (b))
 #define min(a,b) (((a) < (b)) ? (a) : (b))
 
