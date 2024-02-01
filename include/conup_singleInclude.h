@@ -17,19 +17,14 @@
 #define FOREGROUND "38"
 #define BACKGROUND "48"
 
+typedef struct {
+	uint8_t r,g,b;
+} concolor_t;
+
 typedef struct CONUP_CONSOLE_MODIFIER {
 	const char* effect;
-	struct {
-		uint8_t r;
-		uint8_t g;
-		uint8_t b;
-	} foreground, fg;
-	struct {
-		uint8_t r;
-		uint8_t g;
-		uint8_t b;
-	} background, bg;
-
+	concolor_t fg;
+	concolor_t bg;
 } conmod_t;
 
 #ifdef __cplusplus
@@ -114,7 +109,7 @@ const void apply(FILE* out, conmod_t* modi)
 		out = stdout;
 	}
 	fprintf(out, modi->effect);
-	fprintf(out, "\033[%d;2;%d;%d;%d;%d;2;%d;%d;%dm", FOREGROUND, modi->fg.r, modi->fg.g, modi->fg.b, BACKGROUND, modi->bg.r, modi->bg.g, modi->bg.b);
+	fprintf(out, "\033[%s;2;%d;%d;%d;%s;2;%d;%d;%dm", FOREGROUND, modi->fg.r, modi->fg.g, modi->fg.b, BACKGROUND, modi->bg.r, modi->bg.g, modi->bg.b);
 }
 
 const void apply_effect(FILE* out, const char* effect) {
