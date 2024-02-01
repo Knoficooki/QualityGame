@@ -17,6 +17,9 @@
 // This product is licenced under the GNU v2.0 Licence.
 
 unsigned long long ConCharWidth = 80;
+#define MIN_COL_SIZE 80
+unsigned long long ConCharHeight = 25;
+#define MIN_ROW_SIZE 15
 
 
 const char* title = 
@@ -40,11 +43,6 @@ const char* c_version_title =
 
 #if defined(WIN32)
 #include <windows.h>
-
-CONSOLE_SCREEN_BUFFER_INFO csbi;
-int oldWidth = -1;
-int oldHeight = -1;
-
 #else
 #include <sys/ioctl.h>
 #include <unistd.h>
@@ -96,39 +94,128 @@ void printML(const char *str, int offset) {
 	printMultilineWithOffset((char*)str, offset);
 }
 
-umax_t consoleWidth() {
+void getConsoleValues() {
 #ifndef WIN32
-	struct winsize w;
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-	return w.ws_col;
 #else
 	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+#endif
+}
+
+umax_t consoleWidth() {
+#ifndef WIN32
+	return w.ws_col;
+#else
 	int col = csbi.srWindow.Right - csbi.srWindow.Left + 1;
 	return col;
 #endif
 }
+umax_t consoleHeight() {
+#ifndef WIN32
+	return w.ws_row;
+#else
+	int row = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+	return row;
+#endif
+}
 
+
+#ifdef _WIN32
+void setConsoleSize(int width, int height) {
+	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	COORD newSize;
+	SMALL_RECT windowSize;
+
+	newSize.X = width;
+	newSize.Y = height;
+
+	if (!SetConsoleScreenBufferSize(hOut, newSize)) {
+		printf("SetConsoleScreenBufferSize failed\n");
+		return;
+	}
+
+	windowSize.Left = 0;
+	windowSize.Top = 0;
+	windowSize.Right = newSize.X - 1;
+	windowSize.Bottom = newSize.Y - 1;
+
+	if (!SetConsoleWindowInfo(hOut, TRUE, &windowSize)) {
+		printf("SetConsoleWindowInfo failed\n");
+		return;
+	}
+}
+#else
+void setConsoleSize(int width, int height) {
+	struct winsize ws;
+	int fd;
+
+	fd = open("/dev/tty", O_RDWR);
+	if (fd < 0) {
+		perror("open /dev/tty");
+		return;
+	}
+
+	ws.ws_row = height;
+	ws.ws_col = width;
+	ws.ws_xpixel = 0;
+	ws.ws_ypixel = 0;
+
+	if (ioctl(fd, TIOCSWINSZ, &ws) < 0) {
+		perror("ioctl TIOCSWINSZ");
+		return;
+	}
+
+	close(fd);
+}
+#endif
+
+
+void display();
 
 void handle_resize(int sig) {
-	system("clear");
+	getConsoleValues();
 	ConCharWidth = consoleWidth();
+	ConCharHeight = consoleHeight();
+	if (ConCharWidth < MIN_COL_SIZE) {
+		setConsoleSize(MIN_COL_SIZE, ConCharHeight);
+	}
+	if (ConCharHeight < MIN_ROW_SIZE) {
+		setConsoleSize(ConCharWidth, MIN_ROW_SIZE);
+	}
+	display();
 }
 
 void checkResizeEvent() {
+	getConsoleValues();
 	int newWidth = consoleWidth();
-	if (newWidth != oldWidth) {
+	int newHeight = consoleHeight();
+	if (newWidth != oldWidth || newHeight != oldHeight) {
 		handle_resize(0);
 		oldWidth = newWidth;
+		oldHeight = newHeight;
 	}
 }
 
 int main() {
+	getConsoleValues();
 	ConCharWidth = consoleWidth();
-
+	ConCharHeight = consoleHeight();
 #ifndef WIN32
 	signal(SIGWINCH, handle_resize);
 #endif
 
+	display();
+	
+	while (1) {
+#ifdef WIN32
+		checkResizeEvent();
+#endif // WIN32
+	}
+	
+	return 0;
+}
+
+void display() {
 	system("clear");
 	apply(NULL, &mainTitleColor);
 	printML(title, MID);
@@ -136,9 +223,4 @@ int main() {
 	printML(c_version_title, MID);
 	apply(NULL, &contxt);
 	printf("\n");
-	
-	
-	
-	return 0;
 }
-
