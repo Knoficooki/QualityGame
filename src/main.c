@@ -198,21 +198,54 @@ void checkResizeEvent() {
 }
 #endif
 
+uint8_t running = 1;
+
+void handle_sigint(int sig) {
+	running = 0;
+}
+
+#ifdef WIN32
+BOOL WINAPI ConsoleHandler(DWORD dwType)
+{
+	switch (dwType) {
+	case CTRL_C_EVENT:
+		handle_sigint(0);
+		break;
+	case CTRL_BREAK_EVENT:
+		handle_sigint(0);
+		break;
+	default:
+		printf("Event: %d\n", dwType);
+	}
+	return TRUE;
+}
+#endif
+
 int main() {
 	getConsoleValues();
 	ConCharWidth = consoleWidth();
 	ConCharHeight = consoleHeight();
 #ifndef WIN32
 	signal(SIGWINCH, handle_resize);
+	signal(SIGINT, handle_sigint);
+#else
+	if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)ConsoleHandler, TRUE)) {
+		fprintf(stderr, "Unable to install handler!\n");
+		return EXIT_FAILURE;
+	}
 #endif
 
 	display();
 	
-	while (1) {
+	while (running > 0) {
 #ifdef WIN32
 		checkResizeEvent();
 #endif // WIN32
 	}
+
+	apply(NULL, &mainTitleColor);
+	printML("Bye Bye", MID);
+	apply(NULL, &contxt);
 	
 	return 0;
 }
