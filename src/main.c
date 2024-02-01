@@ -185,6 +185,7 @@ void handle_resize(int sig) {
 	display();
 }
 
+#ifdef WIN32 
 void checkResizeEvent() {
 	getConsoleValues();
 	int newWidth = consoleWidth();
@@ -195,6 +196,7 @@ void checkResizeEvent() {
 		oldHeight = newHeight;
 	}
 }
+#endif
 
 int main() {
 	getConsoleValues();
