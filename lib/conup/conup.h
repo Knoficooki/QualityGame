@@ -4,7 +4,7 @@
 #define CONUP_HPP
 
 #include <stdio.h>
-#include <type.hpp>
+#include <stdint.h>
 
 #define RESET "\033[0m"
 #define BOLD "\033[1m"
@@ -17,19 +17,14 @@
 #define FOREGROUND "38"
 #define BACKGROUND "48"
 
+typedef struct {
+	uint8_t r, g, b;
+} concolor_t;
+
 typedef struct CONUP_CONSOLE_MODIFIER {
 	const char* effect;
-	struct {
-		u8 r;
-		u8 g;
-		u8 b;
-	} foreground, fg;
-	struct {
-		u8 r;
-		u8 g;
-		u8 b;
-	} background, bg;
-
+	concolor_t fg;
+	concolor_t bg;
 } conmod_t;
 
 #ifdef __cplusplus

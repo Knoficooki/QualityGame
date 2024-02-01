@@ -40,9 +40,15 @@ const char* c_version_title =
 
 #if defined(WIN32)
 #include <windows.h>
+
+CONSOLE_SCREEN_BUFFER_INFO csbi;
+int oldWidth = -1;
+int oldHeight = -1;
+
 #else
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <signal.h>
 #endif
 
 #include <stdio.h>
@@ -52,29 +58,14 @@ const char* c_version_title =
 #include <string.h>
 #include <stdlib.h>
 
-#include <conup_singleInclude.h>
+#include <conup/conup.h>
+#include "console.h"
 
-conmod_t mainTitleColor = {
-	.effect = BOLD,
-	.fg = (concolor_t){51,204,255},
-	.bg = (concolor_t){3,3,3}
-};
-conmod_t subTitleColor = {
-	.effect = RESET,
-	.fg = (concolor_t){255, 153, 0},
-	.bg = (concolor_t){3,3,3}
-};
-conmod_t contxt = {
-	.effect = RESET,
-	.fg = (concolor_t){245,245,245},
-	.bg = (concolor_t){3,3,3}
-};
+const conmod_t mainTitleColor = { BOLD, {51,204,255}, {3,3,3} };
+const conmod_t subTitleColor = { RESET, {255, 153, 0}, {3,3,3} };
+const conmod_t contxt = { RESET, {245,245,245}, {3,3,3} };
 
-enum OFFSETS {
-	MID = -1
-};
-
-void printWithOffset(const char *str, int offset) {
+void printWithOffset(const char *str, umax_t offset) {
 	switch (offset) {
 	case MID: 
 		offset = (ConCharWidth - stringWidth(str)) / 2;	
@@ -106,14 +97,38 @@ void printML(const char *str, int offset) {
 }
 
 umax_t consoleWidth() {
+#ifndef WIN32
 	struct winsize w;
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 	return w.ws_col;
+#else
+	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+	int col = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+	return col;
+#endif
+}
+
+
+void handle_resize(int sig) {
+	system("clear");
+	ConCharWidth = consoleWidth();
+}
+
+void checkResizeEvent() {
+	int newWidth = consoleWidth();
+	if (newWidth != oldWidth) {
+		handle_resize(0);
+		oldWidth = newWidth;
+	}
 }
 
 int main() {
 	ConCharWidth = consoleWidth();
-	
+
+#ifndef WIN32
+	signal(SIGWINCH, handle_resize);
+#endif
+
 	system("clear");
 	apply(NULL, &mainTitleColor);
 	printML(title, MID);
