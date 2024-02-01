@@ -106,15 +106,13 @@ void printML(const char *str, int offset) {
 }
 
 umax_t consoleWidth() {
-	struct windsite w;
-	ioctl(STDOUT_FILENO, WIOCGWINSZ, &w);
+	struct winsize w;
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+	return w.ws_col;
 }
 
 int main() {
-	struct winsize w;
-	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-	
-	ConCharWidth = w.ws_col;
+	ConCharWidth = consoleWidth();
 	
 	system("clear");
 	apply(NULL, &mainTitleColor);
@@ -128,3 +126,4 @@ int main() {
 	
 	return 0;
 }
+
