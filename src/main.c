@@ -228,6 +228,9 @@ int main() {
 #ifndef WIN32
 	signal(SIGWINCH, handle_resize);
 	signal(SIGINT, handle_sigint);
+	signal(SIGTERM, handle_sigint);
+	signal(SIGQUIT, handle_sigint);
+	signal(SIGKILL, handle_sigint);
 #else
 	if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)ConsoleHandler, TRUE)) {
 		fprintf(stderr, "Unable to install handler!\n");
