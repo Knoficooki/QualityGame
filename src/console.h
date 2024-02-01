@@ -7,8 +7,9 @@ static CONSOLE_SCREEN_BUFFER_INFO csbi;
 static int oldWidth = -1;
 static int oldHeight = -1;
 #else
-#include <sys/ioctl.h>
 #include <unistd.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
 static struct winsize w;
 #endif
 
