@@ -4,14 +4,15 @@
 #include "character.h"
 #include <type.h>
 #include <stdio.h>
+#include <cJSON/cJSON.h>
 
 typedef struct QG_SCENE {
 	const char* text;		// the question
-	const char** answers;		// Answers to the text
+	const char** answers;	// Answers to the text
 	umax_t nAnswers;		// number of answers
 	float* influence;		// the influence on your stats per answer
 	umax_t iofcans;			// the index of the right anwser
-	umax_t requiredlevel;		// minimum level to play this level
+	umax_t requiredlevel;	// minimum level to play this level
 } scene_t;
 
 u8 playScene(scene_t*);

@@ -8,6 +8,9 @@
 * 
 */
 
+#ifndef TYPE_H
+#define TYPE_H
+
 #pragma once
 #include <stdint.h>
 
@@ -31,7 +34,9 @@ typedef float       f32;
 
 #if defined(USE_128BIT_INT)
     typedef __uint128_t u128;
-    #if defined(USE_128BIT_INT_AS_SIZE_T)
-        typedef u128 size_t;
+    #if !defined(DONT_USE_128BIT_INT_AS_MAX)
+        typedef u128 umax_t;
     #endif
 #endif
+
+#endif // !TYPE_H

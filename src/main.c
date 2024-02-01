@@ -198,10 +198,10 @@ void checkResizeEvent() {
 }
 #endif
 
-uint8_t running = 1;
+int8_t gamestate = 0;
 
-void handle_sigint(int sig) {
-	running = 0;
+void handle_sigint() {
+	gamestate = -1;
 }
 
 #ifdef WIN32
@@ -209,10 +209,10 @@ BOOL WINAPI ConsoleHandler(DWORD dwType)
 {
 	switch (dwType) {
 	case CTRL_C_EVENT:
-		handle_sigint(0);
+		handle_sigint();
 		break;
 	case CTRL_BREAK_EVENT:
-		handle_sigint(0);
+		handle_sigint();
 		break;
 	default:
 		printf("Event: %d\n", dwType);
@@ -221,16 +221,39 @@ BOOL WINAPI ConsoleHandler(DWORD dwType)
 }
 #endif
 
+#undef ERROR
+
+enum EXITS {
+	SUCCESSFULL = 0,
+	ERROR,
+	SEGFAULT,
+	ALLOCERR,
+	NONE
+};
+
+enum GAMESTATE {
+	OFF = -1,
+	MENU,
+	RUNNING,
+	QUESTION
+};
+
+/*
+* 
+* Level and own stuff
+* 
+*/
+
+
+level_t* activeLevel;
+
+
 int main() {
 	getConsoleValues();
 	ConCharWidth = consoleWidth();
 	ConCharHeight = consoleHeight();
 #ifndef WIN32
 	signal(SIGWINCH, handle_resize);
-	signal(SIGINT, handle_sigint);
-	signal(SIGTERM, handle_sigint);
-	signal(SIGQUIT, handle_sigint);
-	signal(SIGKILL, handle_sigint);
 #else
 	if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)ConsoleHandler, TRUE)) {
 		fprintf(stderr, "Unable to install handler!\n");
@@ -240,13 +263,49 @@ int main() {
 
 	display();
 	
-	while (running > 0) {
+	char *line = malloc(sizeof(char) * 256);
+	memset(line, '\0', sizeof(char) * 256);
+
+	while (gamestate > OFF) {
 #ifdef WIN32
 		checkResizeEvent();
 #endif // WIN32
+		if (gamestate > MENU) {
+			activeLevel->play();
+		}
+		else
+		{
+			//
+			// Checking for input
+			//
+			printf("> ");
+			if (fgets(line, sizeof(line), stdin) == NULL) {
+				gamestate = 0;
+				continue;
+			}
+			char* tmp = trim(line);
+			char* text = malloc(strlen(tmp) * sizeof(char));
+			if (text == NULL) {
+				return ALLOCERR;
+			}
+			strcpy(text, tmp);
+
+			if (strcmp(text, "quit") == 0) {
+				gamestate = OFF;
+				continue;
+			}
+
+			if (strcmp(text, "start") == 0) {
+				gamestate = RUNNING;
+				continue;
+			}
+			//end
+		}
 	}
 
 	apply(NULL, &mainTitleColor);
+	printML("\nSaving...\n", MID);
+
 	printML("Bye Bye", MID);
 	apply(NULL, &contxt);
 	
