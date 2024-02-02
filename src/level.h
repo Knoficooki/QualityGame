@@ -9,4 +9,6 @@ typedef struct QG_LEVEL {
 	u8 nScenes;
 } level_t;
 
+void play_level();
+
 #endif

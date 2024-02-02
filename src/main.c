@@ -243,10 +243,9 @@ enum GAMESTATE {
 * Level and own stuff
 * 
 */
-
+#include "level.h"
 
 level_t* activeLevel;
-
 
 int main() {
 	getConsoleValues();
@@ -271,7 +270,7 @@ int main() {
 		checkResizeEvent();
 #endif // WIN32
 		if (gamestate > MENU) {
-			activeLevel->play();
+			play_level(activeLevel);
 		}
 		else
 		{
