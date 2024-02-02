@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-u8 playScene(scene_t* scene) {
+u8 play_scene(scene_t* scene) {
 	printf("Scene Output");
 	return 0;
 }
@@ -89,7 +89,7 @@ u8 saveScene(FILE* file, umax_t pos, scene_t* scene)
 
 	// end
 end:
-	cJSON_Delete(scene);
+	cJSON_Delete(scenejson);
 	return 0;
 }
 

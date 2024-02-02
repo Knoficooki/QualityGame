@@ -16,12 +16,10 @@ file(GLOB_RECURSE C_HEADER RELATIVE ${CMAKE_SOURCE_DIR} "src/*.h")
 
 set(LIB_COMPILE_SOURCES)
 
-add_subdirectory(lib/)
-
 add_executable(game 
 	${C_SOURCES} 
 	${C_HEADER} 
-	${LIB_COMPILE_SOURCES}
+	"${PROJECT_SOURCE_DIR}/lib/cJSON/cJSON.c"
 #	${CPP_SOURCES}
 )
 
@@ -30,3 +28,5 @@ target_compile_definitions(game PRIVATE
                             )
 
 set_target_properties(game PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE}")
+
+set_target_properties(game PROPERTIES OUTPUT_NAME "qg")

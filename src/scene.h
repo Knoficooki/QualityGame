@@ -15,7 +15,7 @@ typedef struct QG_SCENE {
 	umax_t requiredlevel;	// minimum level to play this level
 } scene_t;
 
-u8 playScene(scene_t*);
+u8 play_scene(scene_t*);
 
 u8 loadScene(FILE*, umax_t, scene_t*);
 u8 saveScene(FILE*, umax_t, scene_t*);
