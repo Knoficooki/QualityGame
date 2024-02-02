@@ -2,7 +2,7 @@
 The quality game by Lloyd
 
 ## Tree
-
+```
 .
 ├── src/
 │   ├── main.c
@@ -40,3 +40,4 @@ The quality game by Lloyd
 ├── README.md
 ├── LICENSE
 └── CMakeLists.txt
+```
