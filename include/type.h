@@ -25,6 +25,8 @@ typedef int32_t     s32;
 typedef int16_t     s16;
 typedef int8_t      s8;
 typedef float       f32;
+typedef umax_t      umax;
+typedef smax_t      smax;
 #if defined(__cplusplus)
     typedef double      f64;
     #define scast(var, type) static_cast<type>(var)

@@ -1,6 +1,8 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
+#include <type.h>
+
 #if defined(WIN32)
 #include <windows.h>
 static CONSOLE_SCREEN_BUFFER_INFO csbi;
@@ -12,6 +14,9 @@ static int oldHeight = -1;
 #include <sys/ioctl.h>
 static struct winsize w;
 #endif
+
+umax ConCharWidth = 80;
+umax ConCharHeight = 25;
 
 enum OFFSETS {
 	MID = -1
