@@ -15,7 +15,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-void printWithOffset(const char *str, char nCollumns, umax_t offset) {
+void printWithOffset(const char *str, umax_t offset) {
 	switch (offset) {
 	case MID: 
 		offset = (ConCharWidth - stringWidth(str)) / 2;	
@@ -29,7 +29,7 @@ void printWithOffset(const char *str, char nCollumns, umax_t offset) {
 	printf("%s", str);
 }
 
-void printMultilineWithOffset(char *text, int offset, char nCollumns) {
+void printMultilineWithOffset(char *text, int offset) {
 	// Split the multiline string into lines
 	char *multilineStr = strdup(text);
 	char *token = strtok(multilineStr, "\n\0");
@@ -42,7 +42,7 @@ void printMultilineWithOffset(char *text, int offset, char nCollumns) {
 	free(multilineStr);
 }
 
-void printML(const char *str, int offset, char nCollumns) {
+void printML(const char *str, int offset) {
 	printMultilineWithOffset((char*)str, offset);
 }
 
@@ -120,5 +120,3 @@ void setConsoleSize(int width, int height) {
 	close(fd);
 }
 #endif
-
-
