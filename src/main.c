@@ -48,7 +48,10 @@ const char* c_version_title =
 #endif
 
 #include <stdio.h>
+
+#define UTILS_H_IMPLEMENTATION
 #include <utils.h>
+#undef UTILS_H_IMPLEMENTATION
 
 #include <stdio.h>
 #include <string.h>
@@ -129,6 +132,21 @@ enum GAMESTATE {
 	QUESTION
 };
 
+
+
+//
+// INPUT AND STUFF
+//
+//
+
+void flushin() {
+	while((getchar()) != '\n');
+}
+
+void flushout() {
+	fflush(stdout);
+}
+
 /*
 * 
 * Level and own stuff
@@ -144,7 +162,6 @@ int main() {
 	ConCharHeight = consoleHeight();
 #ifndef WIN32
 	signal(SIGWINCH, handle_resize);
-	signal(SIGINT, handle_sigint);
 #else
 	if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)ConsoleHandler, TRUE)) {
 		fprintf(stderr, "Unable to install handler!\n");
@@ -170,16 +187,18 @@ int main() {
 			// Checking for input
 			//
 			printf("> ");
-			if (fgets(line, sizeof(line), stdin) == NULL) {
-				gamestate = 0;
+			flushout();
+			scanf("%[^\n]s\n", line);
+			flushin();
+			if (strlen(line)  == 0) {
+				gamestate = OFF;
 				continue;
 			}
-			char* tmp = trim(line);
-			char* text = malloc(strlen(tmp) * sizeof(char));
+
+			char* text = strtrm(line);
 			if (text == NULL) {
 				return ALLOCERR;
 			}
-			strcpy(text, tmp);
 
 			if (strcmp(text, "quit") == 0) {
 				gamestate = OFF;
@@ -199,7 +218,7 @@ int main() {
 
 	printML("Bye Bye", MID);
 	apply(NULL, &contxt);
-	
+	flushout();
 	return 0;
 }
 

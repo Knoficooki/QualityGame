@@ -1,7 +1,7 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
-#include <type.h>
+#include <utils.h>
 
 #if defined(WIN32)
 #include <windows.h>
@@ -15,8 +15,8 @@ static int oldHeight = -1;
 static struct winsize w;
 #endif
 
-umax ConCharWidth = 80;
-umax ConCharHeight = 25;
+static umax ConCharWidth = 80;
+static umax ConCharHeight = 25;
 
 enum OFFSETS {
 	MID = -1
@@ -24,11 +24,11 @@ enum OFFSETS {
 
 void checkResizeEvent();
 void handle_resize(int);
-umax_t consoleWidth();
-umax_t consoleHeight();
+umax consoleWidth();
+umax consoleHeight();
 void printML(const char*, int);
 void printMultilineWithOffset(char*, int);
-void printWithOffset(const char*, umax_t);
+void printWithOffset(const char*, umax);
 void setConsoleSize(int width, int height);
 void getConsoleValues();
 

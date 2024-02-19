@@ -9,13 +9,12 @@
 #endif
 
 #include <stdio.h>
-#include <utils.h>
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-void printWithOffset(const char *str, umax_t offset) {
+void printWithOffset(const char *str, umax offset) {
 	switch (offset) {
 	case MID: 
 		offset = (ConCharWidth - stringWidth(str)) / 2;	
@@ -35,7 +34,7 @@ void printMultilineWithOffset(char *text, int offset) {
 	char *token = strtok(multilineStr, "\n\0");
 	while (token != NULL) {
 	// Print each line with the specified offset
-		printWithOffset(token, nCollumns, offset);
+		printWithOffset(token, offset);
 		printf("\n");  // Move to the next line
 		token = strtok(NULL, "\n\0");
 	}
@@ -54,7 +53,7 @@ void getConsoleValues() {
 #endif
 }
 
-umax_t consoleWidth() {
+umax consoleWidth() {
 #ifndef WIN32
 	return w.ws_col;
 #else
@@ -62,7 +61,7 @@ umax_t consoleWidth() {
 	return col;
 #endif
 }
-umax_t consoleHeight() {
+umax consoleHeight() {
 #ifndef WIN32
 	return w.ws_row;
 #else
@@ -96,7 +95,9 @@ void setConsoleSize(int width, int height) {
 		return;
 	}
 }
+
 #else
+
 void setConsoleSize(int width, int height) {
 	struct winsize ws;
 	int fd;
@@ -119,4 +120,5 @@ void setConsoleSize(int width, int height) {
 
 	close(fd);
 }
+
 #endif

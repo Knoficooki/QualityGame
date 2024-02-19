@@ -25,11 +25,18 @@ typedef int32_t     s32;
 typedef int16_t     s16;
 typedef int8_t      s8;
 typedef float       f32;
+
+#ifndef _MAX_TYPES_DEFINED
+#define _MAX_TYPES_DEFINED
 typedef umax_t      umax;
 typedef smax_t      smax;
+#endif // _MAX_TYPES_DEFINED
+
 #if defined(__cplusplus)
     typedef double      f64;
     #define scast(var, type) static_cast<type>(var)
+#else 
+    #define scast(var, type) ((type)var)
 #endif
 #define max(a,b) (((a) > (b)) ? (a) : (b))
 #define min(a,b) (((a) < (b)) ? (a) : (b))

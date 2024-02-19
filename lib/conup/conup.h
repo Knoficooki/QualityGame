@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef CONUP_HPP
-#define CONUP_HPP
+#ifndef CONUP_H
+#define CONUP_H
 
 #include <stdio.h>
 #include <stdint.h>
@@ -153,4 +153,4 @@ void apply(std::ostream of, conmod mod) {
 }
 #endif
 
-#endif // CONUP_HPP
+#endif // CONUP_H
