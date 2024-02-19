@@ -164,6 +164,7 @@ char *strtrm(char *s);
 #ifndef NO_STRING_UTILS
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 umax stringWidth(const char* str) {
 	umax i = 0;

@@ -103,12 +103,12 @@ const void apply_color(FILE* out,const char* type, const char r, const char g, c
 	fprintf(out,"\033[%s;2;%d;%d;%dm", type, r, g, b);
 }
 
-const void apply(FILE* out, conmod_t* modi)
+const void apply(FILE* out, const conmod_t* modi)
 {
 	if (out == NULL) {
 		out = stdout;
 	}
-	fprintf(out, modi->effect);
+	fprintf(out, "%s", modi->effect);
 	fprintf(out, "\033[%s;2;%d;%d;%d;%s;2;%d;%d;%dm", FOREGROUND, modi->fg.r, modi->fg.g, modi->fg.b, BACKGROUND, modi->bg.r, modi->bg.g, modi->bg.b);
 }
 
@@ -116,7 +116,7 @@ const void apply_effect(FILE* out, const char* effect) {
 	if (out == NULL) {
 		out = stdout;
 	}
-	fprintf(out, effect);
+	fprintf(out, "%s", effect);
 }
 
 const void reset_color(FILE* out) {
@@ -144,7 +144,7 @@ std::ostream& operator<<(std::ostream& os, const conmod_t& mod) {
 	return os;
 }
 
-void apply(std::ostream of, conmod mod) {
+void apply(std::ostream of, const conmod mod) {
 	std::string out = "\033[";
 	out += FOREGROUND;
 	out += ";2;" + std::to_string(mod.fg.r) + ";" + std::to_string(mod.fg.g) + ";" + std::to_string(mod.fg.b) + ";" +

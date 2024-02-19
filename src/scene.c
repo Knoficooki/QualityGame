@@ -12,6 +12,9 @@ u8 play_scene(scene_t* scene) {
 
 u8 loadScene(FILE* file, umax_t pos, scene_t* scene) 
 {
+	if(scene == NULL) {
+		scene = malloc(sizeof(scene_t));
+	}
 	char* buffer = 0;
 	long length;
 
@@ -33,15 +36,65 @@ u8 loadScene(FILE* file, umax_t pos, scene_t* scene)
 	{
 		return 1;
 	}
+	cJSON *s_text,*s_answers, *s_influences, *s_iofcans, *s_requiredlevel;
+
+
 	cJSON* json = cJSON_ParseWithLength(buffer, length);
+	
+	if (json == NULL)
+	{
+		const char *error_ptr = cJSON_GetErrorPtr();
+		if (error_ptr != NULL)
+		{
+			fprintf(stderr, "Error before: %s\n", error_ptr);
+		}
+		goto end;
+	}
 
+	s_text = cJSON_GetObjectItemCaseSensitive(json, "text");
+	if (cJSON_IsString(s_text) && (s_text->valuestring != NULL)) {
+		scene->text = strdub(s_text->valuestring);
+	}
 
+	s_answers = cJSON_GetObjectItemCaseSensitive(json, "answers");
+	char** answers = malloc(sizeof(char*)*1);
+	umax numAnswers = 0;
+	cJSON *answer = NULL;
+	cJSON_ArrayForEach(answer, s_answers)
+	{
+		answers = realloc(answers , sizeof(char*) * (++numAnswers));
+		cJSON *text = cJSON_GetObjectItemCaseSensitive(answer, "text");
+		if (!cJSON_IsString(text) && (text->valuestring != NULL))
+		{
+			answers[numAnswers-1] = strdub(text->valuestring);
+		}
+	}
+	scene->answer = answers;
+	scene->nAnswers = numAnswers;
+	
+	s_influences = cJSON_GetObjectItemCaseSensitive(json, "influences");
+	cJSON *influence = NULL;
+	
+	float* influeneces = malloc(sizeof(float));
+	umax numinf = 0;
+	cJSON_ArrayForEach(influence, s_influeneces) {
+		influences = realloc(influences, sizeof(float) * (++numinf));
 
+		cJSON *strength = cJSON_GetObjectItemCaseSensitive(influence, "strength");
+		if (!cJSON_IsNumber(strength)) {
+			influences[numinf] = strength->valuedouble;
+		}
+	}
+
+	// TODO: right answer and required level
+
+end:
 	// delete
 	cJSON_Delete(json);
 	free(buffer);
 	return 0;
 }
+
 u8 saveScene(FILE* file, umax_t pos, scene_t* scene) 
 {
 	if (!file) {
@@ -85,7 +138,24 @@ u8 saveScene(FILE* file, umax_t pos, scene_t* scene)
 		cJSON_AddItemToArray(influences, influence);
 	}
 
-	// TODO: index of right answer and required level
+	// TODO: required level
+	if (cJSON_AddNumberToObject(scenejson, "right_answer", scene->iofcans) == NULL)
+	{
+		goto end;
+	}
+	if (cJSON_AddNumberToObject(scenejson, "required_level", scene->requiredlevel) == NULL) 
+	{
+		goto end;
+	}
+	// file print
+	char *string = cJSON_Print(monitor);
+	if (string == NULL)
+	{
+		fprintf(stderr, "Failed to save scene to file.\n");
+	}
+
+	fseek(file, pos, SEEK_SET);
+	fprintf(file, "%s", string);
 
 	// end
 end:
