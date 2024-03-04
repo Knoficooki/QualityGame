@@ -155,9 +155,12 @@ typedef umax count_t;
 #	endif
 #endif // NO_STD_TYPES
 
-umax stringWidth(const char* str);
-char *strtrm(char *s);
-
+umax stringWidth(const char*);
+char* strtrm(char*);
+#ifndef NO_FILE_UTILS
+#include <stdio.h>
+char* fgetstr(FILE*);
+#endif
 
 #ifdef UTILS_H_IMPLEMENTATION
 
@@ -222,7 +225,50 @@ char *strtrm(char *s) {
 	return res;
 }
 
-#	endif // NO_STRING_UTILS
+void strcat_s(char** str, const char* str2) {
+	*str = realloc(*str, strlen(*str) + strlen(str2) + 1);
+	strcat(*str, str2);
+}
+
+
+
+#define BUFFER_TEXT_LEN 255
+// retreves a string from a file. the string has to have the format "{string}" 
+// The file position pointer should point to the first character of the string in the file
+char* parseStringFromFormat(const char* s, const char* delim) {
+	char* buffer = strdup(s);
+	/* states:
+	 * StringClosed = 0
+	 * StringOpen = 1
+	*/
+	char state = 0;
+	umax i = 0;
+	char* token = strtok(buffer, delim);
+	char* res = strdup("");
+	while() {
+		
+		*tmp++ = (char)fgetc(file);
+		if(*tmp == '\"') {
+			*tmp = '\0';
+			break;
+		}
+		++i;
+	}
+	// string of iterator's size
+	// copy only the sting
+	// set the char after the string end to the NULL-Terminator ('\0')
+	// deallocate the buffer
+	
+	char* str = malloc(i + 1);
+	strcpy(str, buffer);
+	str[i] = 0;
+	free(buffer);
+
+	return str;
+}
+
+
+#endif // NO_STRING_UTILS
 #endif // UTILS_H_IMPLEMENTATION
 
 #endif // UTILS_H

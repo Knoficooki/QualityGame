@@ -1,7 +1,7 @@
 #include "scene.h"
 #include <type.h>
-#include <malloc.h>
-#include <memory.h>
+#include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 #include <assert.h>
 
@@ -21,15 +21,14 @@ u8 loadScene(FILE* file, umax_t pos, scene_t* scene)
 	if (file)
 	{
 		fseek(file, 0, SEEK_END);
-		length = ftell(file);
-		fseek(file, 0, SEEK_SET);
+		length = ftell(file) - pos;
+		fseek(file, pos, SEEK_SET);
 		buffer = malloc(length);
 		memset(buffer, 0, length);
 		if (buffer)
 		{
 			fread(buffer, 1, length, file);
 		}
-		fclose(file);
 	}
 
 	if (!buffer)
@@ -50,12 +49,21 @@ u8 loadScene(FILE* file, umax_t pos, scene_t* scene)
 		}
 		goto end;
 	}
-
-	s_text = cJSON_GetObjectItemCaseSensitive(json, "text");
-	if (cJSON_IsString(s_text) && (s_text->valuestring != NULL)) {
-		scene->text = strdub(s_text->valuestring);
+	
+	// name
+	cJSON *s_name;
+	s_name = cJSON_GetObjectItemCaseSensitive(json, "name");
+	if(cJSON_IsString(s_name) && (s_name->valuestring != NULL)) {
+		scene->name = strdup(s_name->valuestring);
 	}
 
+	// text
+	s_text = cJSON_GetObjectItemCaseSensitive(json, "text");
+	if (cJSON_IsString(s_text) && (s_text->valuestring != NULL)) {
+		scene->text = strdup(s_text->valuestring);
+	}
+	
+	// answers
 	s_answers = cJSON_GetObjectItemCaseSensitive(json, "answers");
 	char** answers = malloc(sizeof(char*)*1);
 	umax numAnswers = 0;
@@ -66,18 +74,20 @@ u8 loadScene(FILE* file, umax_t pos, scene_t* scene)
 		cJSON *text = cJSON_GetObjectItemCaseSensitive(answer, "text");
 		if (!cJSON_IsString(text) && (text->valuestring != NULL))
 		{
-			answers[numAnswers-1] = strdub(text->valuestring);
+			answers[numAnswers-1] = strdup(text->valuestring);
 		}
 	}
-	scene->answer = answers;
+	scene->answers = (const char**)answers;
 	scene->nAnswers = numAnswers;
 	
+
+	// influences
 	s_influences = cJSON_GetObjectItemCaseSensitive(json, "influences");
 	cJSON *influence = NULL;
 	
-	float* influeneces = malloc(sizeof(float));
+	float* influences = malloc(sizeof(float));
 	umax numinf = 0;
-	cJSON_ArrayForEach(influence, s_influeneces) {
+	cJSON_ArrayForEach(influence, s_influences) {
 		influences = realloc(influences, sizeof(float) * (++numinf));
 
 		cJSON *strength = cJSON_GetObjectItemCaseSensitive(influence, "strength");
@@ -86,13 +96,27 @@ u8 loadScene(FILE* file, umax_t pos, scene_t* scene)
 		}
 	}
 
-	// TODO: right answer and required level
+	// right answer
+	s_iofcans = cJSON_GetObjectItemCaseSensitive(json, "right_answer");
+	if(!cJSON_IsNumber(s_iofcans)) {
+		scene->iofcans = (umax)s_iofcans->valuedouble;
+	}
+	
+	// required level
+	s_requiredlevel = cJSON_GetObjectItemCaseSensitive(json, "required_level");
+	if(!cJSON_IsNumber(s_requiredlevel)) {
+		scene->requiredlevel = s_requiredlevel->valuedouble;
+	}
+	
+	cJSON_Delete(json);
+	free(buffer);
+	return 0;
 
 end:
 	// delete
 	cJSON_Delete(json);
 	free(buffer);
-	return 0;
+	return 1;
 }
 
 u8 saveScene(FILE* file, umax_t pos, scene_t* scene) 
@@ -104,6 +128,11 @@ u8 saveScene(FILE* file, umax_t pos, scene_t* scene)
 	cJSON* answers = NULL;
 	cJSON* influences = NULL;
 	cJSON* scenejson = cJSON_CreateObject();
+
+	// name
+	if (cJSON_AddStringToObject(scenejson, "name", scene->name) == NULL) {
+		goto end;
+	}
 
 	// text
 	if (cJSON_AddStringToObject(scenejson, "text", scene->text) == NULL) {
@@ -138,17 +167,19 @@ u8 saveScene(FILE* file, umax_t pos, scene_t* scene)
 		cJSON_AddItemToArray(influences, influence);
 	}
 
-	// TODO: required level
+	// right answer
 	if (cJSON_AddNumberToObject(scenejson, "right_answer", scene->iofcans) == NULL)
 	{
 		goto end;
 	}
+
+	// required level
 	if (cJSON_AddNumberToObject(scenejson, "required_level", scene->requiredlevel) == NULL) 
 	{
 		goto end;
 	}
 	// file print
-	char *string = cJSON_Print(monitor);
+	char *string = cJSON_Print(scenejson);
 	if (string == NULL)
 	{
 		fprintf(stderr, "Failed to save scene to file.\n");

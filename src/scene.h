@@ -7,6 +7,7 @@
 #include <cJSON/cJSON.h>
 
 typedef struct QG_SCENE {
+	const char* name;
 	const char* text;		// the question
 	const char** answers;	// Answers to the text
 	umax_t nAnswers;		// number of answers

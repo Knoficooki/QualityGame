@@ -36,7 +36,7 @@ const char* c_version_title =
  /  __ \\  ___ _ _ ___ ___ ___|_|___ ___           \n\
 / /      |___| | | -_|  _|_ -| | . |   |          \n\
 \\ \\ ___       \\_/|___|_| |___| |___|_|_|          \n\
-\\ ___ / ___Jann Hoffmann____|_|_(c) 2024 GNU v2.0\n\
+ \\ ___ / ___Jann Hoffmann____|_|_(c) 2024 GNU v2.0\n\
 ";
 
 #if defined(WIN32)
@@ -65,6 +65,10 @@ const conmod_t subTitleColor = { RESET, {255, 153, 0}, {3,3,3} };
 const conmod_t contxt = { RESET, {245,245,245}, {3,3,3} };
 
 void display();
+
+static umax ConCharWidth = 80;
+static umax ConCharHeight = 25;
+
 
 void handle_resize(int sig) {
 	getConsoleValues();
@@ -223,6 +227,7 @@ int main() {
 }
 
 void display() {
+	flushout();
 	system("clear");
 	apply(NULL, &mainTitleColor);
 	printML(title, MID);
@@ -230,6 +235,7 @@ void display() {
 	printML(c_version_title, MID);
 	apply(NULL, &contxt);
 	printf("\n");
+	flushout();
 }
 
 

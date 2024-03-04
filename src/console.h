@@ -15,8 +15,7 @@ static int oldHeight = -1;
 static struct winsize w;
 #endif
 
-static umax ConCharWidth = 80;
-static umax ConCharHeight = 25;
+static umax ConCHAR_Width = 80, ConCHAR_Height = 25;
 
 enum OFFSETS {
 	MID = -1

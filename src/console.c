@@ -17,7 +17,7 @@
 void printWithOffset(const char *str, umax offset) {
 	switch (offset) {
 	case MID: 
-		offset = (ConCharWidth - stringWidth(str)) / 2;	
+		offset = (ConCHAR_Width - stringWidth(str)) / 2;	
 		break;
 	default:
 		break;
@@ -55,18 +55,20 @@ void getConsoleValues() {
 
 umax consoleWidth() {
 #ifndef WIN32
+	ConCHAR_Width = w.ws_col;
 	return w.ws_col;
 #else
-	int col = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-	return col;
+	ConCHAR_Width = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+	return ConCHAR_Width;
 #endif
 }
 umax consoleHeight() {
 #ifndef WIN32
+	ConCHAR_Height = w.ws_row;
 	return w.ws_row;
 #else
-	int row = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-	return row;
+	ConCHAR_Height = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+	return ConCHAR_Height;
 #endif
 }
 
@@ -94,6 +96,8 @@ void setConsoleSize(int width, int height) {
 		printf("SetConsoleWindowInfo failed\n");
 		return;
 	}
+	ConCHAR_Width = width;
+	ConCHAR_Height = height;
 }
 
 #else
