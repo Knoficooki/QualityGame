@@ -13,22 +13,26 @@
 
 static const char* sceneFilePathStructure = "./scenes/%s.qgscn";
 
-typedef struct LVL_NAMESTRC_VER(0, 1) {
-	const char* title;
-	const char* info;
-	scene_t* scenes;
-	u8 nScenes;
-} LVL_TNAME_VER(0, 1), level_t;
+/*		   'Q G L M ' 
+		    | | | |  */
+#define LVL_MAGIC 0x51474c4d
 
-typedef struct LEVEL_VERSION {
-	u16 major;
-	u16 minor;
-} verdesc;
+#define MAX_LVL_MAJOR 1
+#define MAX_LVL_MINOR 1
+
+#if PROJECT_VERSION_MAJOR != MAX_LVL_MAJOR
+#	error Project does not contain a equivalent level loader for this version
+#endif
+
+typedef LVL_TNAME_VER(MAX_LVL_MAJOR, MAX_LVL_MINOR), level_t;
+
 
 struct LEVEL_FILE_HEADER {
-	char magic[4];
-	verdesc ver;
+	uint32_t  magic;
+	struct { uint8_t major, minor; } ver;
 };
+
+static struct LEVEL_FILE_HEADER LVL_HEADER = { LVL_MAGIC, { PROJECT_VERSION_MAJOR, PROJECT_VERSION_MINOR } };
 
 level_t *loadLevel(const char*);
 
