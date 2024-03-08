@@ -1,3 +1,6 @@
+#ifndef V0M1_LOADER_DEFINED
+#define V0M1_LOADER_DEFINED
+
 #include <utils.h>
 #include "level.h"
 
@@ -21,3 +24,5 @@ typedef struct LVL_NAMESTRC_VER(0,1) {
 */
 
 level_t *loadlvl_v0m1(FILE* lvlfile);
+
+#endif /* V0M1_LOADER_DEFINED */

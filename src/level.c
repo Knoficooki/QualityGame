@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <inisg.h>
 
-#include <levelLoader/v0m1.h>
+#include <levelLoader/v0m1/v0m1.h>
 
 // QGLM
 level_t *loadLevel(const char* filepath) {

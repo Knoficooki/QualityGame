@@ -17,12 +17,10 @@ static const char* sceneFilePathStructure = "./scenes/%s.qgscn";
 		    | | | |  */
 #define LVL_MAGIC 0x51474c4d
 
-#define MAX_LVL_MAJOR 1
-#define MAX_LVL_MINOR 1
+#define MAX_LVL_MAJOR 0
+#define MAX_LVL_MINOR 2
 
-#if PROJECT_VERSION_MAJOR != MAX_LVL_MAJOR
-#	error Project does not contain a equivalent level loader for this version
-#endif
+#include "levelLoader/v0m1/v0m1.h"
 
 typedef LVL_TNAME_VER(MAX_LVL_MAJOR, MAX_LVL_MINOR), level_t;
 
